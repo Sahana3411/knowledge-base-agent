@@ -114,87 +114,38 @@ streamlit run app.py
 
 ### 6. Architecture Diagram
 
-<p align="center">
-<svg width="860" height="520" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- BACKGROUND -->
-  <rect width="860" height="520" fill="#0B0F19" rx="18"/>
-
-  <!-- TITLE -->
-  <text x="430" y="40" fill="#FFFFFF" font-size="26" font-family="Arial" text-anchor="middle">
-    Knowledge Agent – System Architecture
-  </text>
-
-  <!-- UPLOAD BLOCK -->
-  <rect x="40" y="90" width="220" height="120" fill="#1C2333" stroke="#4A90E2" stroke-width="2" rx="12"/>
-  <text x="150" y="130" fill="#FFFFFF" font-size="18" font-family="Arial" text-anchor="middle">Document Upload</text>
-  <text x="150" y="160" fill="#B8C7E0" font-size="14" font-family="Arial" text-anchor="middle">
-    PDF / DOCX / TXT / Images
-  </text>
-
-  <!-- EXTRACTORS -->
-  <rect x="330" y="90" width="220" height="120" fill="#1C2333" stroke="#4A90E2" stroke-width="2" rx="12"/>
-  <text x="440" y="130" fill="#FFFFFF" font-size="18" font-family="Arial" text-anchor="middle">
-    Text Extractors
-  </text>
-  <text x="440" y="160" fill="#B8C7E0" font-size="14" font-family="Arial" text-anchor="middle">
-    extract_pdf • extract_docx • extract_txt • OCR
-  </text>
-
-  <!-- CORPUS -->
-  <rect x="620" y="90" width="220" height="120" fill="#1C2333" stroke="#4A90E2" stroke-width="2" rx="12"/>
-  <text x="730" y="130" fill="#FFFFFF" font-size="18" font-family="Arial" text-anchor="middle">
-    Corpus Builder
-  </text>
-  <text x="730" y="160" fill="#B8C7E0" font-size="14" font-family="Arial" text-anchor="middle">
-    Combined Text (40k chars)
-  </text>
-
-  <!-- LLM ROUTER -->
-  <rect x="330" y="260" width="220" height="120" fill="#1C2333" stroke="#4A90E2" stroke-width="2" rx="12"/>
-  <text x="440" y="300" fill="#FFFFFF" font-size="18" font-family="Arial" text-anchor="middle">
-    LLM Router
-  </text>
-  <text x="440" y="330" fill="#B8C7E0" font-size="14" font-family="Arial" text-anchor="middle">
-    OpenAI • Gemini • Groq
-  </text>
-
-  <!-- CHAT UI -->
-  <rect x="40" y="260" width="220" height="120" fill="#1C2333" stroke="#4A90E2" stroke-width="2" rx="12"/>
-  <text x="150" y="300" fill="#FFFFFF" font-size="18" font-family="Arial" text-anchor="middle">
-    Chat UI (Streamlit)
-  </text>
-  <text x="150" y="330" fill="#B8C7E0" font-size="14" font-family="Arial" text-anchor="middle">
-    Chat history • Chat bubbles
-  </text>
-
-  <!-- STORAGE -->
-  <rect x="620" y="260" width="220" height="120" fill="#1C2333" stroke="#4A90E2" stroke-width="2" rx="12"/>
-  <text x="730" y="300" fill="#FFFFFF" font-size="18" font-family="Arial" text-anchor="middle">
-    Session Storage
-  </text>
-  <text x="730" y="330" fill="#B8C7E0" font-size="14" font-family="Arial" text-anchor="middle">
-    Chat History (Session-only)
-  </text>
-
-  <!-- CONNECTION ARROWS -->
-  <line x1="260" y1="150" x2="330" y2="150" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="550" y1="150" x2="620" y2="150" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="150" y1="210" x2="150" y2="260" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="440" y1="210" x2="440" y2="260" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="730" y1="210" x2="730" y2="260" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="260" y1="320" x2="330" y2="320" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="550" y1="320" x2="620" y2="320" stroke="#4A90E2" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- ARROW MARKER -->
-  <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L9,3 z" fill="#4A90E2" />
-    </marker>
-  </defs>
-
-</svg>
-</p>
+    
+                        ┌────────────────────────────┐
+                        │        User Interface      │
+                        │(Streamlit ChatUI + Sidebar)│
+                        └─────────────┬──────────────┘
+                                      │
+         ┌────────────────────────────┼─────────────────────────────┐
+         │                            │                             │
+┌────────▼────────┐        ┌──────────▼───────────┐        ┌─────────▼─────────┐
+│ File Upload UI  │        │  Chat History Layer  │        │   Settings Panel  │
+│ (PDF/DOCX/TXT)  │        │ (Session State)      │        │ Provider + API Key│
+└────────┬────────┘        └──────────┬───────────┘        └─────────┬─────────┘
+         │                            │                              │
+         ▼                            ▼                              ▼
+ ┌────────────────────┐       ┌──────────────────────┐        ┌────────────────────┐
+ │ Document Extractors│       │ Prompt Builder       │        │ Model Selector     │
+ │ (PyPDF2, DOCX, OCR)│       │ Corpus + History     │        │ OpenAI/Gemini/Groq │
+ └─────────┬──────────┘       └──────────┬───────────┘        └─────────┬──────────┘
+           │                             │                              │
+           ▼                             ▼                              ▼
+ ┌──────────────────────┐      ┌─────────────────────────┐      ┌──────────────────────┐
+ │   Offline Engine     │      │   LLM Query Engine      │      │   API Integrations   │
+ │ (keyword snippet)    │      │  (Chat / Responses)     │      │   OpenAI / Gemini /  │
+ └─────────┬────────────┘      └──────────┬──────────────┘      │        Groq          │
+           │                              │                     └─────────┬────────────┘
+           ▼                              ▼                               ▼
+   ┌────────────────────────────────────────────────────────────────────────────────┐
+   │                              Assistant Response                                │
+   └────────────────────────────────────────────────────────────────────────────────┘
+                                       │
+                                       ▼
+                           Displayed back in UI as chat
 
 
 ### 7. Using the Application
