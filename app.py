@@ -12,18 +12,20 @@ from extractors import extract_pdf, extract_docx, extract_txt, extract_image
 # -----------------------
 # Page config + dark blue CSS
 # -----------------------
-st.set_page_config(page_title="Knowledge Agent — Chat", layout="wide")
-st.markdown(
-    """
-    <style>
-    :root {
-      --bg: #090348;
-      --card: #0e3a63;
-      --accent: #1e90ff;
-      --text: #e6f0ff;
-      --muted: #bcd3f5;
-    }
-    .stTextInput input {
+st.set_page_config(page_title="Knowledge Based Agent ", layout="wide")
+st.markdown("""
+<style>
+
+:root {
+  --bg: #250D44;
+  --card: #171C21;
+  --accent: #1e90ff;
+  --text: #e6f0ff;
+  --muted: #bcd3f5;
+}
+
+/* Input boxes */
+.stTextInput input {
     background: #ffffff !important;
     color: #000000 !important;
     caret-color: #1e90ff !important;
@@ -36,23 +38,89 @@ textarea {
     caret-color: #1e90ff !important;
     border-radius: 6px;
 }
-    html, body, .main, .stApp {
-      background: linear-gradient(180deg,var(--bg), #07203a);
-      color: var(--text);
-    }
-    .stButton>button { background-color: var(--accent); color: white; border-radius:8px; }
-    .stSidebar { background-color: var(--card); color: var(--text); padding: 12px; border-radius:8px; }
-    .stTextInput>div>div>input { background: #fff; color: #000; border-radius:6px; }
-    .css-1d391kg { background: rgba(255,255,255,0.02); } /* card tweak - may vary by streamlit version */
-    .stDownloadButton>button { background-color: #0b78d1; color: white; }
-    .stFileUploader label { color: var(--text); }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+
+/* Background */
+html, body, .main, .stApp {
+    background: linear-gradient(180deg,var(--bg), #07203a);
+    color: var(--text);
+}
+
+/* Buttons */
+.stButton>button {
+    background-color: var(--accent);
+    color: white;
+    border-radius: 8px;
+}
+
+/* Sidebar */
+.stSidebar {
+    background-color: var(--card);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* Upload / misc styling */
+.stDownloadButton>button {
+    background-color: #0b78d1;
+    color: white;
+}
+
+.stFileUploader label {
+    color: var(--text);
+}
+
+/* ---------- CHAT UI ONLY ---------- */
+.chat-container {
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 12px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    margin-bottom: 15px;
+}
+
+/* User bubble */
+.chat-bubble-user {
+    background: #e6f0ff;
+    color: #000;
+    padding: 10px 14px;
+    border-radius: 14px;
+    max-width: 60%;
+    margin-bottom: 8px;
+    border: 1px solid #c9dbf8;
+    text-align: left;
+}
+
+/* Assistant bubble */
+.chat-bubble-assistant {
+    background: #d7e6ff;
+    color: #000;
+    padding: 10px 14px;
+    border-radius: 14px;
+    max-width: 60%;
+    margin-bottom: 8px;
+    margin-left: auto;
+    border: 1px solid #b8cef0;
+    text-align: left;
+}
+
+/* Timestamps */
+.timestamp {
+    font-size: 12px;
+    color: #bcd3f5;
+    margin-top: -3px;
+    margin-bottom: 10px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 
 st.title("Knowledge Base Agent — Chat")
 st.write("Upload documents, paste an API key in the sidebar (session-only), and chat. History retained in session.")
+st.markdown("---")
 
 # -----------------------
 # Folders
@@ -293,15 +361,25 @@ def history_to_openai_messages(history):
 # -----------------------
 # Main chat UI (single send)
 # -----------------------
-st.subheader("Chat (session history)")
 
-# render chat
 for msg in st.session_state.history:
     role = msg.get("role")
+    content = msg.get("content")
+    ts = msg.get("ts", time.time())
+    timestr = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime(ts))
+
     if role == "user":
-        st.markdown(f"**You:** {msg['content']}")
+        st.markdown(f"""
+        <div class="chat-bubble-user"><b>You</b><br>{content}</div>
+        <div class="timestamp">{timestr}</div>
+        """, unsafe_allow_html=True)
+
     elif role == "assistant":
-        st.markdown(f"**Assistant:** {msg['content']}")
+        st.markdown(f"""
+        <div class="chat-bubble-assistant"><b>Assistant</b><br>{content}</div>
+        <div class="timestamp" style="text-align:right;">{timestr}</div>
+        """, unsafe_allow_html=True)
+
 
 # Input + Send
 user_msg = st.text_input("Type your message and click Send", key="user_input")
@@ -312,21 +390,6 @@ send_col, export_col = st.columns([4, 1])
 with send_col:
     send_clicked = st.button("Send")
 
-with export_col:
-    export_clicked = st.button("Export Chat")
-
-# ---------- EXPORT CHAT BUTTON ----------
-if export_clicked:
-    if st.session_state.history:
-        data = json.dumps(st.session_state.history, indent=2, ensure_ascii=False)
-        st.download_button(
-            "Download Chat",
-            data,
-            file_name="chat_history.json",
-            mime="application/json"
-        )
-    else:
-        st.warning("No chat history to export.")
 
 # ---------- SEND BUTTON ----------
 if send_clicked:
@@ -335,12 +398,14 @@ if send_clicked:
     else:
         # append user message to history
         st.session_state.history.append({"role":"user", "content": user_msg, "ts": time.time()})
+        data = json.dumps(st.session_state.history, indent=2, ensure_ascii=True)
 
         # Try offline snippet first if no API key
         offline_ans, snippets = offline_answer(corpus, user_msg, top_k=5)
 
         if offline_ans and not api_key:
             st.session_state.history.append({"role":"assistant", "content": offline_ans, "ts": time.time()})
+            data = json.dumps(st.session_state.history, indent=2, ensure_ascii=False)
             try:
                 st.experimental_rerun()
             except Exception:
@@ -366,10 +431,10 @@ if send_clicked:
                     # store assistant reply
                     st.session_state.history.append({"role":"assistant", "content": ans, "ts": time.time()})
                     try:
-                        st.experimental_rerun()
-                    except Exception:
-                        st.success("Answer received and added to history. Refresh to see updated chat.")
-
+                        st.rerun()
+                    except Exception: 
+                        st.success()
+                          
                 except requests.HTTPError as he:
                     code = he.response.status_code
                     body = ""
