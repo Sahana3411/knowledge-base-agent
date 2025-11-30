@@ -211,7 +211,7 @@ st.sidebar.markdown("---")
 # -----------------------
 # Build corpus (no preview)
 # -----------------------
-def build_corpus(limit_chars=40000):
+def build_corpus(limit_chars=80000):
     parts = []
     for fname in sorted(os.listdir(UPLOAD_DIR)):
         p = os.path.join(UPLOAD_DIR, fname)
@@ -337,7 +337,7 @@ def call_groq(api_key, prompt_text, api_url=None, model="llama-3.1-8b-instant", 
 def build_system_instruction():
     return (
         "You are a helpful knowledge assistant. Use ONLY the provided document text to answer user questions. "
-        "If the answer is not present, reply: 'Not found in provided documents.' Keep answers concise."
+        "If the answer is not present, reply: 'Not found in provided documents.' Keep answers little concise."
     )
 
 def build_prompt_from_history(corpus_text, history, user_message):
@@ -407,7 +407,7 @@ if send_clicked:
             st.session_state.history.append({"role":"assistant", "content": offline_ans, "ts": time.time()})
             data = json.dumps(st.session_state.history, indent=2, ensure_ascii=False)
             try:
-                st.experimental_rerun()
+                st.rerun()
             except Exception:
                 st.success("Offline answer added. Refresh to see updated chat.")
 
