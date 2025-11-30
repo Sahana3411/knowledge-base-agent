@@ -177,7 +177,7 @@ if docs:
                 st.sidebar.success(f"Deleted {d}")
                 # try rerun; if experimental_rerun not available, instruct user to refresh
                 try:
-                    st.experimental_rerun()
+                    st.rerun()
                 except Exception:
                     st.sidebar.info("File deleted — refresh the page to update the list.")
             except Exception as e:
@@ -198,7 +198,7 @@ if "history" not in st.session_state:
 if st.sidebar.button("Clear history"):
     st.session_state.history = []
     try:
-        st.experimental_rerun()
+        st.rerun()
     except Exception:
         st.sidebar.success("History cleared (refresh page if it still appears).")
 
