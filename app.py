@@ -133,26 +133,48 @@ Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
 # -----------------------
 st.sidebar.header("Documents & LLM Settings")
 
-# Upload files (saved to docs/)
+# Maintain uploaded file list in session_state
+if "saved_files" not in st.session_state:
+    st.session_state.saved_files = set()
+
 uploaded = st.sidebar.file_uploader(
     "Drag & drop (PDF, DOCX, TXT, PNG, JPG) — multiple OK",
     accept_multiple_files=True
 )
+
 if uploaded:
     saved = []
+
     for f in uploaded:
+
+        # Avoid re-saving if file already uploaded earlier
+        if f.name in st.session_state.saved_files:
+            continue
+
         out = Path(UPLOAD_DIR) / f.name
+
+        # If same filename exists physically — avoid duplicates by renaming
         base, ext = out.stem, out.suffix
         i = 1
         while out.exists():
             out = Path(UPLOAD_DIR) / f"{base}_{i}{ext}"
             i += 1
+
+        # Save file
         with open(out, "wb") as wf:
             wf.write(f.read())
+
+        # Track saved file to avoid duplicates
+        st.session_state.saved_files.add(out.name)
         saved.append(out.name)
-    st.sidebar.success(f"Saved {len(saved)} file(s).")
+
+    if saved:
+        st.sidebar.success(f"Saved {len(saved)} file(s).")
+    else:
+        st.sidebar.info("Files already uploaded earlier.")
 
 st.sidebar.markdown("---")
+
 
 provider = st.sidebar.selectbox("LLM Provider (paste key below)", ["OpenAI", "Google Gemini", "Groq"])
 api_key = st.sidebar.text_input("Paste API key (session-only)", type="password")
