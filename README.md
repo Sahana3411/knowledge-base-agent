@@ -197,39 +197,6 @@ streamlit run app.py
 </p>
 
 
-                        ┌────────────────────────────┐
-                        │        User Interface      │
-                        │(Streamlit ChatUI + Sidebar)│
-                        └─────────────┬──────────────┘
-                                      │
-         ┌────────────────────────────┼─────────────────────────────┐
-         │                            │                             │
-┌────────▼────────┐        ┌──────────▼───────────┐        ┌─────────▼─────────┐
-│ File Upload UI  │        │  Chat History Layer  │        │   Settings Panel  │
-│ (PDF/DOCX/TXT)  │        │ (Session State)      │        │ Provider + API Key│
-└────────┬────────┘        └──────────┬───────────┘        └─────────┬─────────┘
-         │                            │                              │
-         ▼                            ▼                              ▼
- ┌────────────────────┐       ┌──────────────────────┐        ┌────────────────────┐
- │ Document Extractors│       │ Prompt Builder       │        │ Model Selector     │
- │ (PyPDF2, DOCX, OCR)│       │ Corpus + History     │        │ OpenAI/Gemini/Groq │
- └─────────┬──────────┘       └──────────┬───────────┘        └─────────┬──────────┘
-           │                             │                              │
-           ▼                             ▼                              ▼
- ┌──────────────────────┐      ┌─────────────────────────┐      ┌──────────────────────┐
- │   Offline Engine     │      │   LLM Query Engine      │      │   API Integrations   │
- │ (keyword snippet)    │      │  (Chat / Responses)     │      │   OpenAI / Gemini /  │
- └─────────┬────────────┘      └──────────┬──────────────┘      │        Groq          │
-           │                              │                     └─────────┬────────────┘
-           ▼                              ▼                               ▼
-   ┌────────────────────────────────────────────────────────────────────────────────┐
-   │                              Assistant Response                                │
-   └────────────────────────────────────────────────────────────────────────────────┘
-                                       │
-                                       ▼
-                           Displayed back in UI as chat
-
-
 ### 7. Using the Application
 
 In the sidebar:
