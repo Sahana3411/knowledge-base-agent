@@ -50,9 +50,9 @@ The purpose of this agent is to serve as a lightweight, user-friendly knowledge 
 
 ### AI / LLM Providers
 
-• OpenAI (Chat/Responses API)
-• Google Gemini (REST API)
-• Groq (OpenAI-compatible endpoint)
+* OpenAI (Chat/Responses API)
+* Google Gemini (REST API)
+* Groq (OpenAI-compatible endpoint)
 
 ### Document Processing
 
