@@ -125,8 +125,8 @@ streamlit run app.py
      │ File Upload UI  │        │  Chat History Layer  │        │   Settings Panel  │
      │ (PDF/DOCX/TXT)  │        │ (Session State)      │        │ Provider + API Key│
      └────────┬────────┘        └──────────┬───────────┘        └─────────┬─────────┘
-            │                            │                              │
-            ▼                            ▼                              ▼
+              │                            │                              │
+              ▼                            ▼                              ▼
     ┌────────────────────┐       ┌──────────────────────┐        ┌────────────────────┐
     │ Document Extractors│       │ Prompt Builder       │        │ Model Selector     │
     │ (PyPDF2, DOCX, OCR)│       │ Corpus + History     │        │ OpenAI/Gemini/Groq │
